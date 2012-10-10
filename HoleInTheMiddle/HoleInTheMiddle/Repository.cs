@@ -35,10 +35,7 @@ namespace HoleInTheMiddle
         {
             return RunQuery(command =>
                                 {
-                                    var parameter = command.CreateParameter();
-                                    parameter.ParameterName = "@Type";
-                                    parameter.Value = fruit.Type;
-                                    command.Parameters.Add(parameter);
+                                    command.AddParameter("@Type", fruit.Type);
                                     command.CommandText = "SELECT TOP 1 [Color] FROM [Fruits] WHERE [Type] = @Type";
                                     return command.ExecuteScalar() as string;
                                 });
@@ -48,10 +45,7 @@ namespace HoleInTheMiddle
         {
             return RunQuery(command =>
                                 {
-                                    var parameter = command.CreateParameter();
-                                    parameter.ParameterName = "@Type";
-                                    parameter.Value = fruit.Type;
-                                    command.Parameters.Add(parameter);
+                                    command.AddParameter("@Type", fruit.Type);
                                     command.CommandText = "SELECT COUNT * FROM [Fruits] WHERE [Type] = @Type";
                                     var result = command.ExecuteScalar() as int?;
                                     return result.HasValue ? result.Value : 0;
@@ -63,10 +57,7 @@ namespace HoleInTheMiddle
             return RunQuery(command =>
                                 {
                                     var result = new List<string>();
-                                    var parameter = command.CreateParameter();
-                                    parameter.ParameterName = "@Type";
-                                    parameter.Value = fruit.Type;
-                                    command.Parameters.Add(parameter);
+                                    command.AddParameter("@Type", fruit.Type);
                                     command.CommandText = "SELECT DISTINCT [Color] FROM [Fruits] WHERE [Type] = @Type";
                                     var reader = command.ExecuteReader();
                                     while (reader.Read())
@@ -75,6 +66,17 @@ namespace HoleInTheMiddle
                                     }
                                     return result;
                                 });
+        }
+    }
+
+    public static class CommandExtensions
+    {
+        public static void AddParameter<T>(this DbCommand command, string name, T value)
+        {
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = name;
+            parameter.Value = value;
+            command.Parameters.Add(parameter);
         }
     }
 
